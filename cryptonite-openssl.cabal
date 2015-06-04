@@ -21,6 +21,7 @@ source-repository head
 
 Library
   Exposed-modules:   Crypto.OpenSSL.ECC
+                     Crypto.OpenSSL.AES
   Other-modules:
   Build-depends:     base >= 4.3 && < 5
                    , bytestring
