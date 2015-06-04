@@ -1,9 +1,11 @@
-cryptonite
-==========
+cryptonite-openssl
+==================
 
 [![Build Status](https://travis-ci.org/vincenthz/cryptonite-openssl.png?branch=master)](https://travis-ci.org/vincenthz/cryptonite-openssl)
 [![BSD](http://b.repl.ca/v1/license-BSD-blue.png)](http://en.wikipedia.org/wiki/BSD_licenses)
 [![Haskell](http://b.repl.ca/v1/language-haskell-lightgrey.png)](http://haskell.org)
+
+Support for OpenSSL based crypto operations in Haskell, as a bolt-in to [cryptonite](http://hackage.haskell.org/package/cryptonite)
 
 If you have no idea what're you doing, please do not use this directly, rely on
 higher level protocols or higher level implementation.
