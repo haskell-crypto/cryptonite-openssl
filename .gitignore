@@ -1,0 +1,9 @@
+*.o
+*.hi
+*.tix
+*.mix
+dist
+QA
+benchs/Bench
+benchs/Hash
+*.sublime-workspace
