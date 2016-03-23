@@ -17,7 +17,7 @@ Support
 
 cryptonite-openssl supports the following platform:
 
-* Windows >= 8
+* Windows >= 7
 * OSX >= 10.8
 * Linux
 
@@ -46,3 +46,15 @@ Building on MacOS X
 Building on windows
 -------------------
 
+You need the C++ runtime :
+
+* http://www.microsoft.com/downloads/details.aspx?familyid=bd2a6171-e2d6-4230-b809-9a8d7548c1b6
+
+And the right installation of OpenSSL. Some binary installations are available here:
+
+* https://slproweb.com/products/Win32OpenSSL.html
+
+Building with alternative OpenSSL - BoringSSL, LibreSSL
+-------------------------------------------------------
+
+TODO

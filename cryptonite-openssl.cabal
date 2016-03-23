@@ -20,13 +20,30 @@ source-repository head
   location: https://github.com/vincenthz/cryptonite-openssl
 
 Library
-  Exposed-modules:   Crypto.OpenSSL.ECC
+  Exposed-modules:   Crypto.OpenSSL
+                     Crypto.OpenSSL.ECC
+                     Crypto.OpenSSL.BN
                      Crypto.OpenSSL.AES
-  Other-modules:
+  Other-modules:     Crypto.OpenSSL.ECC.Foreign
+                   , Crypto.OpenSSL.BN.Foreign
+                   , Crypto.OpenSSL.AES.Foreign
+                   , Crypto.OpenSSL.Misc
+                   , Crypto.OpenSSL.ASN1
   Build-depends:     base >= 4.3 && < 5
                    , bytestring
+                   , memory
   ghc-options:       -Wall -fwarn-tabs -optc-O3
   default-language:  Haskell2010
+  if os(mingw32) || os(windows)
+    extra-libraries: eay32, ssl32
+  else
+    if os(osx)
+      extra-libraries: crypto
+      extra-lib-dirs: /usr/local/lib
+      include-dirs: /usr/local/include
+    else
+      extra-libraries: crypto
+  cpp-options:       -DUSE_OPENSSL
 
 Test-Suite test-cryptonite-openssl
   type:              exitcode-stdio-1.0
