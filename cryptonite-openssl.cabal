@@ -10,14 +10,14 @@ Maintainer:          vincent@snarc.org
 Category:            Cryptography
 Stability:           experimental
 Build-Type:          Simple
-Homepage:            https://github.com/vincenthz/cryptonite-openssl
-Bug-reports:         https://github.com/vincenthz/cryptonite-openssl/issues
+Homepage:            https://github.com/haskell-crypto/cryptonite-openssl
+Bug-reports:         https://github.com/haskell-crypto/cryptonite-openssl/issues
 Cabal-Version:       >=1.10
 extra-doc-files:     README.md
 
 source-repository head
   type: git
-  location: https://github.com/vincenthz/cryptonite-openssl
+  location: https://github.com/haskell-crypto/cryptonite-openssl
 
 Library
   Exposed-modules:   Crypto.OpenSSL
