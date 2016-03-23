@@ -45,6 +45,7 @@ module Crypto.OpenSSL.ECC
     ) where
 
 import           Control.Monad (void)
+import           Control.Applicative
 import           Crypto.OpenSSL.ECC.Foreign
 import           Crypto.OpenSSL.ASN1
 import           Crypto.OpenSSL.BN

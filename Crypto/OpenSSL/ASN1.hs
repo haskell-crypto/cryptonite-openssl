@@ -8,6 +8,7 @@ import          Foreign.Ptr
 import          Foreign.C.Types
 import          Foreign.C.String
 import          Crypto.OpenSSL.Misc
+import          Control.Applicative
 
 -- | openssl ASN1 unique identifier
 newtype Nid = Nid Int
