@@ -27,6 +27,7 @@ type GCMCtx = ForeignPtr EVP_CIPHER_CTX
 
 data Direction = DirectionEncrypt | DirectionDecrypt
 
+-- | Get whether the OpenSSL version linked supports GCM mode (at least 1.0.x and above)
 isSupportedGCM :: Bool
 isSupportedGCM = doIO $ do
     cipher <- ssl_c_aes_256_gcm
@@ -49,7 +50,11 @@ withGCM direction key iv f = doIO $ do
 {-# NOINLINE withGCM #-}
 
 -- | One shot function to GCM data without any incremental handling
-encryptGCM :: ByteString -> ByteString -> ByteString -> ByteString -> ByteString
+encryptGCM :: ByteString -- ^ Key
+           -> ByteString -- ^ IV
+           -> ByteString -- ^ Header (Authenticated input, will be not be copied to output)
+           -> ByteString -- ^ Plaintext to encrypt
+           -> ByteString -- ^ Encrypted input including the authentication tag (but not the header)
 encryptGCM key iv header input = withGCM DirectionEncrypt key iv $ \ctx -> do
     -- consume the header as authenticated data
     when (headerLength > 0) $ do
@@ -71,7 +76,11 @@ encryptGCM key iv header input = withGCM DirectionEncrypt key iv $ \ctx -> do
 {-# NOINLINE encryptGCM #-}
 
 -- | One shot function to decrypt GCM data without any incremental handling
-decryptGCM :: ByteString -> ByteString -> ByteString -> ByteString -> Maybe ByteString
+decryptGCM :: ByteString -- ^ Key
+           -> ByteString -- ^ IV
+           -> ByteString -- ^ Header (Authenticated input)
+           -> ByteString -- ^ Encrypted data
+           -> Maybe ByteString -- ^ Decrypted data if authentication successful
 decryptGCM key iv header input
     | inputLength < gcmTagLength = Nothing
     | otherwise                  = withGCM DirectionDecrypt key iv $ \ctx -> do
