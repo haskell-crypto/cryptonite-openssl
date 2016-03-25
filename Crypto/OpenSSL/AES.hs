@@ -4,6 +4,12 @@
 -- Stability   : experimental
 -- Portability : Unix
 --
+-- Small Ad-Hoc bindings to AES-GCM encryption and decryption function.
+--
+-- Doesn't support incremental mode yet.
+--
+-- TODO: full fledge AES bindings (CBC, CTR, GCM...), with incremental processing.
+--
 module Crypto.OpenSSL.AES
     ( isSupportedGCM
     , encryptGCM
