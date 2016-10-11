@@ -30,6 +30,7 @@ module Crypto.OpenSSL.ECC
     , ecPointIsOnCurve
     , ecPointEq
     -- * EcPoint serialization
+    , PointConversionForm(..)
     , ecPointToOct
     , ecPointFromOct
     , ecPointFromJProjectiveGFp
