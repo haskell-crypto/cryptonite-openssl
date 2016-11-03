@@ -47,6 +47,7 @@ Test-Suite test-cryptonite-openssl
   type:              exitcode-stdio-1.0
   hs-source-dirs:    tests
   Main-is:           Tests.hs
+  Other-modules:     Imports
   Build-Depends:     base >= 3 && < 5
                    , bytestring
                    , tasty
