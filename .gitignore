@@ -3,6 +3,7 @@
 *.tix
 *.mix
 dist
+.stack-work
 QA
 benchs/Bench
 benchs/Hash
