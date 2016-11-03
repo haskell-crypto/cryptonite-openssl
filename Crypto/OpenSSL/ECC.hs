@@ -328,6 +328,7 @@ ecPointIsOnCurve (EcGroup g) (EcPoint p) = doIO $
     ((==) 1 <$> ssl_point_is_on_curve gptr pptr bnCtx)
 {-# NOINLINE ecPointIsOnCurve #-}
 
+-- | Create a binary represention of a point using the specific format
 ecPointToOct :: B.ByteArray outBytes => EcGroup -> EcPoint -> PointConversionForm -> outBytes
 ecPointToOct (EcGroup g) (EcPoint p) pconv = doIO $
     withForeignPtr g $ \gptr  ->
@@ -339,6 +340,7 @@ ecPointToOct (EcGroup g) (EcPoint p) pconv = doIO $
   where form = ecPointConversionToC pconv
 {-# NOINLINE ecPointToOct #-}
 
+-- | Try to parse a binary representation to a point
 ecPointFromOct :: B.ByteArrayAccess inBytes => EcGroup -> inBytes -> Either String EcPoint
 ecPointFromOct (EcGroup g) bs = doIO $ do
     (opensslRet,point) <- withForeignPtr g            $ \gptr ->
@@ -372,6 +374,7 @@ ecPointToJProjectiveGFp (EcGroup g) (EcPoint p) = doIO $
         (,,) <$> bnToInt bnX <*> bnToInt bnY <*> bnToInt bnZ
 {-# NOINLINE ecPointToJProjectiveGFp #-}
 
+-- | Convert a (x,y) to a point representation on a prime curve.
 ecPointFromAffineGFp :: EcGroup -> (Integer, Integer) -> EcPoint
 ecPointFromAffineGFp (EcGroup g) (x,y) = doIO $
     withForeignPtr g    $ \gptr  ->
@@ -382,6 +385,7 @@ ecPointFromAffineGFp (EcGroup g) (x,y) = doIO $
         check $ ssl_point_set_affine_coordinates_GFp gptr r bnX bnY bnCtx
 {-# NOINLINE ecPointFromAffineGFp #-}
 
+-- | Convert a point of a prime curve to affine representation (x,y)
 ecPointToAffineGFp :: EcGroup -> EcPoint -> (Integer, Integer)
 ecPointToAffineGFp (EcGroup g) (EcPoint p) = doIO $
     withForeignPtr g  $ \gptr  ->
