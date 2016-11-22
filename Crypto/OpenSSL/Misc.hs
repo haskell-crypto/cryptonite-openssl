@@ -28,6 +28,7 @@ check f = do
     if r == 0
         then throwIO $ OpenSSLError (fromIntegral r)
         else return ()
+{-# INLINE check #-}
 
 checkCtx :: Exception e => (String -> e) -> String -> IO CInt -> IO ()
 checkCtx exnConstr n f = do
