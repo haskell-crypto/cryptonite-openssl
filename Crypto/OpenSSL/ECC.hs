@@ -47,6 +47,7 @@ module Crypto.OpenSSL.ECC
 
 import           Control.Monad (void)
 import           Control.Applicative
+import           Control.Exception (bracket)
 import           Crypto.OpenSSL.ECC.Foreign
 import           Crypto.OpenSSL.ASN1
 import           Crypto.OpenSSL.BN
@@ -93,6 +94,10 @@ withPointDup grp p f = do
     ptr <- ssl_point_dup p grp
     f ptr
     EcPoint <$> newForeignPtr ssl_point_free_funptr ptr
+
+withPointTemp :: Ptr EC_GROUP -> (Ptr EC_POINT -> IO a) -> IO a
+withPointTemp grp f = bracket (ssl_point_new grp) (ssl_point_free) f
+
 
 -- | try to get a curve group from an ASN1 description string (OID)
 --
