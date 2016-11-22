@@ -24,6 +24,8 @@ module Crypto.OpenSSL.ECC
     , ecPointDbl
     , ecPointMul
     , ecPointMulWithGenerator
+    , ecPointsMulAndSum
+    , ecPointsMulOfPowerAndSum
     , ecPointGeneratorMul
     , ecPointInvert
     , ecPointInfinity
@@ -52,6 +54,7 @@ import           Control.Exception (bracket)
 import           Crypto.OpenSSL.ECC.Foreign
 import           Crypto.OpenSSL.ASN1
 import           Crypto.OpenSSL.BN
+import           Crypto.OpenSSL.BN.Foreign
 import           Crypto.OpenSSL.Misc
 import           Foreign.ForeignPtr
 import           Foreign.Ptr
@@ -286,6 +289,47 @@ ecPointMul (EcGroup g) (EcPoint q) m = doIO $
     withIntegerAsBN m $ \bnM   ->
     withPointNew gptr $ \r -> check $ ssl_point_mul gptr r nullPtr qptr bnM bnCtx
 {-# NOINLINE ecPointMul #-}
+
+-- | compute sum (\(q,m) -> q * m) l
+ecPointsMulAndSum :: EcGroup -> [(EcPoint, Integer)] -> EcPoint
+ecPointsMulAndSum g []          = ecPointInfinity g
+ecPointsMulAndSum (EcGroup g) l = doIO $
+    withForeignPtr g  $ \gptr  ->
+    withBnCtxNew      $ \bnCtx ->
+    withPointNew gptr $ \rptr  ->
+    withPointTemp gptr $ \tptr -> do
+        check $ ssl_point_set_to_infinity gptr rptr
+        forM_ l $ \(EcPoint p,m) -> do
+            withForeignPtr p $ \pptr -> withIntegerAsBN m $ \bnM -> check $ ssl_point_mul gptr tptr nullPtr pptr bnM bnCtx
+            check $ ssl_point_add gptr rptr rptr tptr bnCtx
+
+-- | Compute the sum of the point to the nth power
+--
+-- > f [p1,p2,..,pi] n = p1 * (n ^ 0) + p2 * (n ^ 1) + .. + pi * (n ^ i-1)
+ecPointsMulOfPowerAndSum :: EcGroup -> [EcPoint] -> Integer -> EcPoint
+ecPointsMulOfPowerAndSum g [] _               = ecPointInfinity g
+ecPointsMulOfPowerAndSum (EcGroup g) l startn = doIO $
+    withForeignPtr g       $ \gptr  ->
+    withBnCtxNew           $ \bnCtx ->
+    withIntegerAsBN startn $ \n     ->
+    withBnNew              $ \nIter ->
+    withBnNew              $ \gMod  ->
+    withPointNew gptr      $ \rptr  ->
+    withPointTemp gptr     $ \tptr  -> do
+        check $ ssl_group_get_order gptr gMod bnCtx
+        check $ ssl_bn_one nIter
+        start gptr gMod bnCtx n nIter rptr tptr
+  where
+    start gptr gMod bnCtx n nIter rptr tptr = loop l
+      where
+        loop []     = return ()
+        loop (EcPoint x:xs) = do
+            -- r += x * current-n
+            withForeignPtr x $ \xptr -> check $ ssl_point_mul gptr tptr nullPtr xptr nIter bnCtx
+            check $ ssl_point_add gptr rptr rptr tptr bnCtx
+            -- nIter = nIter * n
+            check $ ssl_bn_mod_mul nIter nIter n gMod bnCtx
+            loop xs
 
 -- | compute generator * n + q * m
 ecPointMulWithGenerator :: EcGroup
