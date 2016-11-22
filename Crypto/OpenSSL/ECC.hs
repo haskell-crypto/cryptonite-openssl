@@ -20,6 +20,7 @@ module Crypto.OpenSSL.ECC
     , ecGroupGetCurveGF2m
     -- * EcPoint arithmetic
     , ecPointAdd
+    , ecPointsSum
     , ecPointDbl
     , ecPointMul
     , ecPointMulWithGenerator
@@ -45,7 +46,7 @@ module Crypto.OpenSSL.ECC
     , ecKeyToPair
     ) where
 
-import           Control.Monad (void)
+import           Control.Monad (void, forM_)
 import           Control.Applicative
 import           Control.Exception (bracket)
 import           Crypto.OpenSSL.ECC.Foreign
@@ -252,6 +253,17 @@ ecPointAdd (EcGroup g) (EcPoint p1) (EcPoint p2) = doIO $
     withBnCtxNew      $ \bnCtx ->
     withPointNew gptr $ \r -> check $ ssl_point_add gptr r p1ptr p2ptr bnCtx
 {-# NOINLINE ecPointAdd #-}
+
+-- | Add many points together
+ecPointsSum :: EcGroup -> [EcPoint] -> EcPoint
+ecPointsSum g []               = ecPointInfinity g
+ecPointsSum (EcGroup g) ((EcPoint x):xs) = doIO $
+    withForeignPtr g       $ \gptr ->
+    withForeignPtr x       $ \xptr ->
+    withBnCtxNew           $ \bnCtx ->
+    withPointDup gptr xptr $ \rptr ->
+        forM_ xs $ \(EcPoint p) -> withForeignPtr p $ \pptr -> do
+            check $ ssl_point_add gptr rptr rptr pptr bnCtx
 
 -- | compute the doubling of the point p, r = p^2
 ecPointDbl :: EcGroup -> EcPoint -> EcPoint
