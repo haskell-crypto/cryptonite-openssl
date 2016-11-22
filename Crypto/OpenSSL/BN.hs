@@ -7,8 +7,6 @@ import           Foreign.Ptr
 import           Foreign.ForeignPtr
 import           Crypto.Number.Serialize
 
-import           Data.Bits
-import qualified Data.ByteString as B
 import qualified Data.ByteString.Internal as B
 
 withIntegerAsBN :: Integer -> (Ptr BIGNUM -> IO a) -> IO a
