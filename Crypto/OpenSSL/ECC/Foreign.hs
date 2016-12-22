@@ -1,4 +1,5 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE CPP #-}
 module Crypto.OpenSSL.ECC.Foreign where
 
 import           Foreign.C.Types
@@ -7,11 +8,18 @@ import           Foreign.Ptr
 
 import           Crypto.OpenSSL.BN.Foreign
 
+#include <openssl/opensslconf.h>
+
 data EC_GROUP
 data EC_POINT
 data EC_KEY
 
 type PointConversionFormT = CInt
+
+#ifdef OPENSSL_NO_EC2M
+gf2m_not_supported :: a
+gf2m_not_supported = error "GF2m not supported"
+#endif
 
 foreign import ccall unsafe "OBJ_txt2nid"
     ssl_obj_txt2nid :: Ptr CChar -> IO CInt
@@ -22,8 +30,13 @@ foreign import ccall unsafe "&EC_GROUP_free"
 foreign import ccall unsafe "EC_GROUP_new_by_curve_name"
     ssl_group_new_by_curve_name :: CInt -> IO (Ptr EC_GROUP)
 
+#ifdef OPENSSL_NO_EC2M
+ssl_group_new_curve_GF2m :: Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO (Ptr EC_GROUP)
+ssl_group_new_curve_GF2m = gf2m_not_supported
+#else
 foreign import ccall unsafe "EC_GROUP_new_curve_GF2m"
     ssl_group_new_curve_GF2m :: Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO (Ptr EC_GROUP)
+#endif
 
 foreign import ccall unsafe "EC_GROUP_new_curve_GFp"
     ssl_group_new_curve_GFp :: Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO (Ptr EC_GROUP)
@@ -40,8 +53,13 @@ foreign import ccall unsafe "EC_GROUP_get_degree"
 foreign import ccall unsafe "EC_GROUP_get_curve_GFp"
     ssl_group_get_curve_gfp :: Ptr EC_GROUP -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
 
+#ifdef OPENSSL_NO_EC2M
+ssl_group_get_curve_gf2m :: Ptr EC_GROUP -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
+ssl_group_get_curve_gf2m = gf2m_not_supported
+#else
 foreign import ccall unsafe "EC_GROUP_get_curve_GF2m"
     ssl_group_get_curve_gf2m :: Ptr EC_GROUP -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
+#endif
 
 foreign import ccall unsafe "EC_GROUP_get0_generator"
     ssl_group_get0_generator :: Ptr EC_GROUP -> IO (Ptr EC_POINT)
@@ -129,17 +147,29 @@ foreign import ccall unsafe "EC_POINT_set_affine_coordinates_GFp"
 foreign import ccall unsafe "EC_POINT_get_affine_coordinates_GFp"
     ssl_point_get_affine_coordinates_GFp :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
 
+foreign import ccall unsafe "EC_POINT_set_compressed_coordinates_GFp"
+    ssl_point_set_compressed_coordinates_GFp :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> CInt -> Ptr BN_CTX -> IO CInt
+
+#ifdef OPENSSL_NO_EC2M
+ssl_point_set_affine_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
+ssl_point_set_affine_coordinates_GF2m = gf2m_not_supported
+
+ssl_point_get_affine_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
+ssl_point_get_affine_coordinates_GF2m = gf2m_not_supported
+
+ssl_point_set_compressed_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> CInt -> Ptr BN_CTX -> IO CInt
+ssl_point_set_compressed_coordinates_GF2m = gf2m_not_supported
+
+#else
 foreign import ccall unsafe "EC_POINT_set_affine_coordinates_GF2m"
     ssl_point_set_affine_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
 
 foreign import ccall unsafe "EC_POINT_get_affine_coordinates_GF2m"
     ssl_point_get_affine_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> Ptr BIGNUM -> Ptr BN_CTX -> IO CInt
 
-foreign import ccall unsafe "EC_POINT_set_compressed_coordinates_GFp"
-    ssl_point_set_compressed_coordinates_GFp :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> CInt -> Ptr BN_CTX -> IO CInt
-
 foreign import ccall unsafe "EC_POINT_set_compressed_coordinates_GF2m"
     ssl_point_set_compressed_coordinates_GF2m :: Ptr EC_GROUP -> Ptr EC_POINT -> Ptr BIGNUM -> CInt -> Ptr BN_CTX -> IO CInt
+#endif
 
 -------------------------------
 -- EC_KEY related functions
