@@ -43,7 +43,7 @@ Library
     else
       if arch(x86_64)
         cpp-options: -D__x86_64__
-      elif arch(i386)
+      if arch(i386)
         cpp-options: -D__i386__
     extra-libraries: crypto
   cpp-options:       -DUSE_OPENSSL
