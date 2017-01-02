@@ -1,5 +1,5 @@
 Name:                cryptonite-openssl
-Version:             0.4
+Version:             0.5
 Synopsis:            Crypto stuff using OpenSSL cryptographic library
 Description:         cryptography
 License:             BSD3
