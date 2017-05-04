@@ -27,7 +27,6 @@ import           Foreign.C.Types
 import           Foreign.Storable
 import           Data.ByteString (ByteString)
 import qualified Data.ByteArray as B
-import qualified Data.Memory.PtrMethods as B (memSet)
 
 type GCMCtx = ForeignPtr EVP_CIPHER_CTX
 
@@ -116,10 +115,9 @@ checkRet = checkCtx OpenSSLGcmError
 
 contextNew :: (Ptr EVP_CIPHER_CTX -> IO ()) -> IO GCMCtx
 contextNew f = do
-    ptr <- mallocBytes sizeofEVP
-    B.memSet (castPtr ptr) 0 (fromIntegral sizeofEVP)
-    f ptr
-    newForeignPtr ssl_c_cipher_ctx_cleanup ptr
+    fptr <- compatNewEvpCipherCtx
+    withForeignPtr fptr f
+    return fptr
 
 nullEngine :: Ptr ENGINE
 nullEngine = nullPtr

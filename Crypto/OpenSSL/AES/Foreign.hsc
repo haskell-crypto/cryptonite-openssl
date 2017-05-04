@@ -5,20 +5,31 @@ module Crypto.OpenSSL.AES.Foreign where
 #include <openssl/opensslv.h>
 #include <openssl/evp.h>
 
-#if OPENSSL_VERSION_NUMBER > 0x10001000
+#if OPENSSL_VERSION_NUMBER >= 0x10100000
+#define OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10001000
 #define OPENSSL_HAS_PBKDF2
 #define OPENSSL_HAS_GCM
 #endif
 
+import Foreign.Marshal.Alloc
 import Foreign.Ptr
+import Foreign.ForeignPtr
 import Foreign.C.Types
 import Data.Word
+#ifndef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
+import qualified Data.Memory.PtrMethods as B (memSet)
+#endif
 
 gcmTagLength :: Int
 gcmTagLength = 16
 
+#ifndef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
 sizeofEVP :: Int
 sizeofEVP = (#const sizeof(EVP_CIPHER_CTX))
+#endif
 
 data ENGINE
 
@@ -32,14 +43,33 @@ type DataBuf = Ptr Word8
 type OutputOffset = Ptr CInt
 type InputLength = CInt
 
+compatNewEvpCipherCtx :: IO (ForeignPtr EVP_CIPHER_CTX)
+compatNewEvpCipherCtx = do
+#ifdef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
+    ptr <- ssl_c_cipher_ctx_new
+    newForeignPtr ssl_c_cipher_ctx_free ptr
+#else
+    ptr <- mallocBytes sizeofEVP
+    B.memSet (castPtr ptr) 0 (fromIntegral sizeofEVP)
+    ssl_c_cipher_ctx_init ptr
+    newForeignPtr ssl_c_cipher_ctx_cleanup ptr
+#endif
+
+#ifdef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
+foreign import ccall unsafe "EVP_CIPHER_CTX_new"
+    ssl_c_cipher_ctx_new :: IO (Ptr EVP_CIPHER_CTX)
+#endif
+
 foreign import ccall unsafe "EVP_CIPHER_CTX_init"
     ssl_c_cipher_ctx_init :: Ptr EVP_CIPHER_CTX -> IO ()
 
 foreign import ccall unsafe "&EVP_CIPHER_CTX_free"
     ssl_c_cipher_ctx_free :: FunPtr (Ptr EVP_CIPHER_CTX -> IO ())
 
+#ifndef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
 foreign import ccall unsafe "&EVP_CIPHER_CTX_cleanup"
     ssl_c_cipher_ctx_cleanup :: FunPtr (Ptr EVP_CIPHER_CTX -> IO ())
+#endif
 
 foreign import ccall unsafe "EVP_CIPHER_CTX_ctrl"
     ssl_c_cipher_ctx_ctrl :: Ptr EVP_CIPHER_CTX -> CInt -> CInt -> Ptr a -> IO CInt
