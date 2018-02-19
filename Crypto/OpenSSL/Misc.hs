@@ -11,6 +11,7 @@ import           Control.Exception
 import           Data.Typeable
 import           Foreign.C.Types (CInt)
 import           System.IO.Unsafe (unsafePerformIO)
+import           Basement.Compat.CallStack
 
 data OpenSSLError = OpenSSLError Int
     deriving (Show,Read,Eq,Typeable)
@@ -22,7 +23,7 @@ newtype OpenSSLGcmError = OpenSSLGcmError String
 
 instance Exception OpenSSLGcmError
 
-check :: IO CInt -> IO ()
+check :: HasCallStack => IO CInt -> IO ()
 check f = do
     r <- f
     if r == 0
