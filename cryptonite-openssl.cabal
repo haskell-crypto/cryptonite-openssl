@@ -20,6 +20,8 @@ source-repository head
   location: https://github.com/haskell-crypto/cryptonite-openssl
 
 Library
+  if impl(ghc < 8.0)
+    buildable: False
   Exposed-modules:   Crypto.OpenSSL
                      Crypto.OpenSSL.ECC
                      Crypto.OpenSSL.BN
@@ -30,7 +32,7 @@ Library
                    , Crypto.OpenSSL.AES.Foreign
                    , Crypto.OpenSSL.Misc
                    , Crypto.OpenSSL.ASN1
-  Build-depends:     base >= 4.3 && < 5
+  Build-depends:     base
                    , bytestring
                    , basement
                    , memory
@@ -56,7 +58,7 @@ Test-Suite test-cryptonite-openssl
   hs-source-dirs:    tests
   Main-is:           Tests.hs
   Other-modules:     Imports
-  Build-Depends:     base >= 3 && < 5
+  Build-Depends:     base
                    , bytestring
                    , tasty
                    , tasty-quickcheck
