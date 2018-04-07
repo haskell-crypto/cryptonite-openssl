@@ -13,7 +13,6 @@ Build-Type:          Simple
 Homepage:            https://github.com/haskell-crypto/cryptonite-openssl
 Bug-reports:         https://github.com/haskell-crypto/cryptonite-openssl/issues
 Cabal-Version:       >=1.10
-extra-doc-files:     README.md
 
 source-repository head
   type: git
