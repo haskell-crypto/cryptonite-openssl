@@ -1,7 +1,7 @@
 Name:                cryptonite-openssl
 Version:             0.6
 Synopsis:            Crypto stuff using OpenSSL cryptographic library
-Description:         cryptography
+Description:         Crypto stuff using the OpenSSL cryptographic library as bindings
 License:             BSD3
 License-file:        LICENSE
 Copyright:           Vincent Hanquez <vincent@snarc.org>
