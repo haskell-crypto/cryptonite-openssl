@@ -60,8 +60,10 @@ foreign import ccall unsafe "EVP_CIPHER_CTX_new"
     ssl_c_cipher_ctx_new :: IO (Ptr EVP_CIPHER_CTX)
 #endif
 
+#ifndef OPENSSL_HAS_OPAQUE_EVP_CIPHER_CTX
 foreign import ccall unsafe "EVP_CIPHER_CTX_init"
     ssl_c_cipher_ctx_init :: Ptr EVP_CIPHER_CTX -> IO ()
+#endif
 
 foreign import ccall unsafe "&EVP_CIPHER_CTX_free"
     ssl_c_cipher_ctx_free :: FunPtr (Ptr EVP_CIPHER_CTX -> IO ())
