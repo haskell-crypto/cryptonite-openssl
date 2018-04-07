@@ -15,27 +15,7 @@ Documentation: [cryptonite-openssl on hackage](http://hackage.haskell.org/packag
 Support
 -------
 
-cryptonite-openssl supports the following platform:
-
-* Windows >= 7
-* OSX >= 10.8
-* Linux
-
-On the following architectures:
-
-* x86-64
-* i386
-
-On the following haskell versions:
-
-* GHC 7.0.x
-* GHC 7.4.x
-* GHC 7.6.x
-* GHC 7.8.x
-* GHC 7.10.x
-
-Further platforms and architectures probably works too, but until maintainer(s) don't have regular
-access to them, we can't commit for further support
+See [Haskell packages guidelines section support](https://github.com/vincenthz/haskell-pkg-guidelines/blob/master/README.md#support)
 
 Building on MacOS X
 -------------------
@@ -57,4 +37,4 @@ And the right installation of OpenSSL. Some binary installations are available h
 Building with alternative OpenSSL - BoringSSL, LibreSSL
 -------------------------------------------------------
 
-TODO
+Not currently tried or implemented, but this is probably easy to do.
