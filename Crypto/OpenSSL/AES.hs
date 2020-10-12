@@ -47,7 +47,7 @@ withGCM direction key iv f = doIO $ do
     withForeignPtr fptr $ \ctx    ->
         B.withByteArray key $ \keyPtr ->
         B.withByteArray iv  $ \ivPtr  -> do
-            checkRet "ctx_ctrl_set_ivlen" (ssl_c_cipher_ctx_ctrl ctx ctrl_GCM_SET_IVLEN 12 nullPtr)
+            checkRet "ctx_ctrl_set_ivlen" (ssl_c_cipher_ctx_ctrl ctx ctrl_GCM_SET_IVLEN (fromIntegral $ B.length iv) nullPtr)
             case direction of
                 DirectionEncrypt -> checkRet "encryptinit_ex" (ssl_c_encryptinit_ex ctx nullPtr nullEngine keyPtr ivPtr)
                 DirectionDecrypt -> checkRet "decryptinit_ex" (ssl_c_decryptinit_ex ctx nullPtr nullEngine keyPtr ivPtr)
